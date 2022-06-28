@@ -3,6 +3,8 @@ import { auth } from "fb";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 export default function Auth() {
@@ -48,6 +50,23 @@ export default function Auth() {
         setError(errorMessage);
       });
   };
+  const onClickSignInWithGoogle = (event) => {
+    event.preventDefault();
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // Sign In with Google
+        const user = result.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        // Error
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+        setError(errorMessage);
+      });
+  };
 
   return (
     <div>
@@ -76,7 +95,11 @@ export default function Auth() {
         />
       </form>
       <form>
-        <input type="submit" value="Sigin In with Google" />
+        <input
+          type="button"
+          value="Sign In with Google"
+          onClick={onClickSignInWithGoogle}
+        />
       </form>
       {error ? <div>{error}</div> : null}
     </div>
