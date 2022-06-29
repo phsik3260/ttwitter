@@ -7,6 +7,8 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
+import Ttweet from "components/Ttweet";
+import { computeHeadingLevel } from "@testing-library/react";
 
 export default function Home({ userInfo }) {
   const [ttweet, setTtweet] = useState("");
@@ -20,7 +22,11 @@ export default function Home({ userInfo }) {
     onSnapshot(q, (querySnapshot) => {
       const ttweets = [];
       querySnapshot.forEach((doc) => {
-        ttweets.push(doc.data());
+        const ttweetObj = {
+          ...doc.data(),
+          id: doc.id,
+        };
+        ttweets.push(ttweetObj);
       });
       setTtweets(ttweets);
     });
@@ -62,9 +68,11 @@ export default function Home({ userInfo }) {
       </form>
       <div>
         {ttweets.map((ttweet) => (
-          <div key={ttweet.createdAt}>
-            <h4>{ttweet.text}</h4>
-          </div>
+          <Ttweet
+            key={ttweet.id}
+            ttweet={ttweet}
+            isOwner={ttweet.creatorId === userInfo.uid}
+          />
         ))}
       </div>
     </div>
