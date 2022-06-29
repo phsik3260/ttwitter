@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { fireDB } from "fb";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
 
-export default function Home() {
+export default function Home({ userInfo }) {
   const [ttweet, setTtweet] = useState("");
   const [ttweets, setTtweets] = useState([]);
   const getTtweets = async () => {
-    const querySnapshot = await getDocs(collection(fireDB, "ttweets"));
-    querySnapshot.forEach((doc) => {
-      const ttweetObj = {
-        ...doc.data(),
-        id: doc.id,
-      };
-      setTtweets((curr) => [ttweetObj, ...curr]);
+    // Real time
+    const q = query(
+      collection(fireDB, "ttweets"),
+      orderBy("createdAt", "desc")
+    );
+    onSnapshot(q, (querySnapshot) => {
+      const ttweets = [];
+      querySnapshot.forEach((doc) => {
+        ttweets.push(doc.data());
+      });
+      setTtweets(ttweets);
     });
   };
   useEffect(() => {
@@ -23,8 +33,9 @@ export default function Home() {
     try {
       // Create ttweet
       await addDoc(collection(fireDB, "ttweets"), {
-        ttweet,
+        text: ttweet,
         createdAt: Date.now(),
+        creatorId: userInfo.uid,
       });
     } catch (error) {
       // Error
@@ -51,8 +62,8 @@ export default function Home() {
       </form>
       <div>
         {ttweets.map((ttweet) => (
-          <div key={ttweet.id}>
-            <h4>{ttweet.ttweet}</h4>
+          <div key={ttweet.createdAt}>
+            <h4>{ttweet.text}</h4>
           </div>
         ))}
       </div>

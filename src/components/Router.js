@@ -5,14 +5,14 @@ import Home from "routes/Home";
 import Profile from "routes/Profile";
 import Navigation from "components/Navigation";
 
-export default function Router({ isLoggedIn }) {
+export default function Router({ isLoggedIn, userInfo }) {
   return (
     <HashRouter>
       {isLoggedIn && <Navigation />}
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home userInfo={userInfo} />} />
             <Route path="/profile" element={<Profile />} />
           </>
         ) : (
