@@ -33,20 +33,22 @@ export default function Ttweet({ ttweet, isOwner }) {
   };
 
   return isEditing ? (
-    <>
-      <form onSubmit={onSubmit}>
-        <input
-          type="text"
-          placeholder="Edit your TTweet!"
-          maxLength="120"
-          required
-          value={newTtweet}
-          onChange={onChange}
-        />
-        <input type="submit" value="Update TTweet" />
-      </form>
-      <button onClick={onClickCancelBtn}>Cancel</button>
-    </>
+    isOwner && (
+      <>
+        <form onSubmit={onSubmit}>
+          <input
+            type="text"
+            placeholder="Edit your TTweet!"
+            maxLength="120"
+            required
+            value={newTtweet}
+            onChange={onChange}
+          />
+          <input type="submit" value="Update TTweet" />
+        </form>
+        <button onClick={onClickCancelBtn}>Cancel</button>
+      </>
+    )
   ) : (
     <div key={ttweet.createdAt}>
       <h4>{ttweet.text}</h4>

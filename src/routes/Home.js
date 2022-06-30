@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { fireDB } from "fb";
 import {
   collection,
@@ -8,11 +8,12 @@ import {
   orderBy,
 } from "firebase/firestore";
 import Ttweet from "components/Ttweet";
-import { computeHeadingLevel } from "@testing-library/react";
 
 export default function Home({ userInfo }) {
   const [ttweet, setTtweet] = useState("");
   const [ttweets, setTtweets] = useState([]);
+  const [attachment, setAttachment] = useState(null);
+  const fileInput = useRef();
   const getTtweets = async () => {
     // Real time
     const q = query(
@@ -52,6 +53,18 @@ export default function Home({ userInfo }) {
   const onChange = ({ target: { value } }) => {
     setTtweet(value);
   };
+  const onChangeFile = ({ target: { files } }) => {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file); // Read file
+    reader.addEventListener("loadend", ({ currentTarget: { result } }) =>
+      setAttachment(result)
+    ); //  Then triger loadend and get image
+  };
+  const onClickClearImgBtn = () => {
+    fileInput.current.value = null;
+    setAttachment(null);
+  };
 
   return (
     <div>
@@ -64,7 +77,19 @@ export default function Home({ userInfo }) {
           value={ttweet}
           onChange={onChange}
         />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={onChangeFile}
+          ref={fileInput}
+        />
         <input type="submit" value="TTweet" />
+        {attachment && (
+          <div>
+            <img src={attachment} width="100px" height="100px" />
+            <button onClick={onClickClearImgBtn}>Clear Img</button>
+          </div>
+        )}
       </form>
       <div>
         {ttweets.map((ttweet) => (
