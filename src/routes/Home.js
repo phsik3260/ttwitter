@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { fireDB } from "fb";
+import { fireDB, storage } from "fb";
 import {
   collection,
   addDoc,
@@ -8,6 +8,8 @@ import {
   orderBy,
 } from "firebase/firestore";
 import Ttweet from "components/Ttweet";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home({ userInfo }) {
   const [ttweet, setTtweet] = useState("");
@@ -37,18 +39,39 @@ export default function Home({ userInfo }) {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
+
+    const ttweetObj = {
+      text: ttweet,
+      createdAt: Date.now(),
+      creatorId: userInfo.uid,
+    };
+
+    if (attachment !== null) {
+      // Image ref
+      const imagesRef = ref(storage, `${userInfo.uid}/${uuidv4()}`);
+      // Image URL upload to Storage
+      await uploadString(imagesRef, attachment, "data_url");
+      // Get image URL
+      await getDownloadURL(imagesRef)
+        .then((url) => {
+          ttweetObj["imgUrl"] = url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+
     try {
       // Create ttweet
-      await addDoc(collection(fireDB, "ttweets"), {
-        text: ttweet,
-        createdAt: Date.now(),
-        creatorId: userInfo.uid,
-      });
+      await addDoc(collection(fireDB, "ttweets"), ttweetObj);
     } catch (error) {
       // Error
       console.log(error);
     }
+
     setTtweet("");
+    fileInput.current.value = null;
+    setAttachment(null);
   };
   const onChange = ({ target: { value } }) => {
     setTtweet(value);

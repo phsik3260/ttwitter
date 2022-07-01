@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { fireDB } from "fb";
+import { fireDB, storage } from "fb";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
 
 export default function Ttweet({ ttweet, isOwner }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -12,6 +13,10 @@ export default function Ttweet({ ttweet, isOwner }) {
     if (confirm) {
       // Delete ttweet
       await deleteDoc(doc(fireDB, "ttweets", `${ttweet.id}`));
+      // Delete image
+      if (ttweet.imgUrl) {
+        await deleteObject(ref(storage, ttweet.imgUrl));
+      }
     }
   };
   const onClickEditBtn = () => {
@@ -52,6 +57,9 @@ export default function Ttweet({ ttweet, isOwner }) {
   ) : (
     <div key={ttweet.createdAt}>
       <h4>{ttweet.text}</h4>
+      {ttweet.imgUrl && (
+        <img src={ttweet.imgUrl} width="100px" height="100px" />
+      )}
       {isOwner && (
         <>
           <button onClick={onClickDeleteBtn}>Delete</button>
