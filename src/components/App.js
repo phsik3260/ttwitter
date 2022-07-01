@@ -13,7 +13,6 @@ export default function App() {
         // User is here
         setIsLoggedIn(true);
         setUserInfo(user);
-        // ...
       } else {
         // User is signed out
         setIsLoggedIn(false);

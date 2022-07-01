@@ -115,6 +115,7 @@ export default function Home({ userInfo }) {
         )}
       </form>
       <div>
+        <h2>All TTweets</h2>
         {ttweets.map((ttweet) => (
           <Ttweet
             key={ttweet.id}
